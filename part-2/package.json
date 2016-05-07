@@ -1,0 +1,25 @@
+{
+  "name": "brunch-with-elm",
+  "version": "1.0.0",
+  "description": "Brunch With Elm",
+  "main": "brunch-config.js",
+  "scripts": {
+    "postinstall": "elm package install",
+    "start": "brunch watch --server",
+    "prod": "brunch build --production"
+  },
+  "keywords": [
+    "elm",
+    "brunch",
+    "sass"
+  ],
+  "author": "Alaister Young <a@alaisteryoung.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "brunch": "^2.7.0",
+    "elm-brunch": "^0.4.4",
+    "hmr-brunch": "^0.1.0",
+    "sass-brunch": "^2.6.2",
+    "auto-reload-brunch": "^2.7.1"
+  }
+}
