@@ -1,19 +1,16 @@
-module Main (..) where
+module Main exposing (..)
 
-import Html exposing (..)
-import Html.Events exposing (..)
-import Html.Attributes exposing (..)
-import StartApp.Simple exposing (start)
-import String
-import CardParser
+import Html.App exposing (beginnerProgram)
+import Html exposing (div)
+import ParserComponent exposing (Model, Msg, init, view, update)
 
 
 main =
-  StartApp.Simple.start
-    { model = model
-    , update = update
-    , view = view
-    }
+    Html.App.beginnerProgram
+        { model = init "" ""
+        , view = view
+        , update = update
+        }
 
 
 
@@ -21,82 +18,41 @@ main =
 
 
 type alias Model =
-  String
+    { firstParser : ParserComponent.Model
+    , secondParser : ParserComponent.Model
+    }
 
 
-model =
-  ""
+init first second =
+    Model first second
 
 
 
 -- UPDATE
 
 
-type Action
-  = ChangeText String
+type Msg
+    = First ParserComponent.Msg
+    | Second ParserComponent.Msg
 
 
-update : Action -> Model -> Model
-update action model =
-  case action of
-    ChangeText s ->
-      s
+update msg model =
+    case msg of
+        First m ->
+            { model | firstParser = ParserComponent.update m model.firstParser }
+
+        Second m ->
+            { model | secondParser = ParserComponent.update m model.secondParser }
 
 
 
 -- VIEW
 
 
-sentence s =
-  p [ cardStyle ] [ text s ]
-
-view : Signal.Address Action -> Model -> Html
-view address model =
-  let
-    cards =
-      model
-        |> String.trim
-        |> String.split " "
-        |> List.map CardParser.spellCard
-  in
-    div
-      [ mainStyle ]
-      [ input
-          [ inputStyle
-          , placeholder "Type your cards..."
-          , on "input" targetValue (ChangeText >> Signal.message address)
-          ]
-          []
-      , div [] (List.map sentence cards)
-      ]
-
-
-mainStyle : Attribute
-mainStyle =
-  style
-    [ ( "padding", "40px" )
-    , ( "display", "flex" )
-    , ( "flex-direction", "column" )
-    , ( "align-items", "stretch" )
-    , ( "background-color", "#fafafa" )
-    , ( "border", "lightgray solid 1px" )
-    ]
-
-
-inputStyle : Attribute
-inputStyle =
-  style
-    [ ( "border", "#fafafa solid" )
-    , ( "border-bottom", "lightgray solid 1px" )
-    , ( "font-size", "2em" )
-    , ( "color", "rgba(0,0,0,0.75)" )
-    , ( "background-color", "#fafafa" )
-    ]
-
-
-cardStyle : Attribute
-cardStyle =
-  style
-    [ ( "font-size", "2em" )
-    , ( "color", "rgba(0,0,0,0.75)" )
-    ]
+view model =
+    div []
+        [ Html.App.map First
+            (ParserComponent.view model.firstParser)
+        , Html.App.map Second
+            (ParserComponent.view model.secondParser)
+        ]

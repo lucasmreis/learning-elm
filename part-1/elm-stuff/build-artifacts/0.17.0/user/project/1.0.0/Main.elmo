@@ -1,0 +1,156 @@
+var _user$project$Main$printValue = function (value) {
+	var _p0 = value;
+	_v0_9:
+	do {
+		if (_p0.ctor === 'Num') {
+			switch (_p0._0) {
+				case 2:
+					return 'Two';
+				case 3:
+					return 'Three';
+				case 4:
+					return 'Four';
+				case 5:
+					return 'Five';
+				case 6:
+					return 'Six';
+				case 7:
+					return 'Seven';
+				case 8:
+					return 'Eight';
+				case 9:
+					return 'Nine';
+				case 10:
+					return 'Ten';
+				default:
+					break _v0_9;
+			}
+		} else {
+			break _v0_9;
+		}
+	} while(false);
+	return _elm_lang$core$Basics$toString(value);
+};
+var _user$project$Main$printSuit = function (suit) {
+	return _elm_lang$core$Basics$toString(suit);
+};
+var _user$project$Main$printCard = function (card) {
+	var _p1 = card;
+	if (_p1.ctor === 'OrdinaryCard') {
+		return _elm_lang$core$String$concat(
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_user$project$Main$printValue(_p1._0),
+					' of ',
+					_user$project$Main$printSuit(_p1._1)
+				]));
+	} else {
+		return 'Joker';
+	}
+};
+var _user$project$Main$divideCardString = function (str) {
+	var chars = _elm_lang$core$String$toList(str);
+	var suit = _elm_lang$core$List$head(
+		_elm_lang$core$List$reverse(chars));
+	var value = A2(
+		_elm_lang$core$Maybe$map,
+		_elm_lang$core$String$fromList,
+		A2(
+			_elm_lang$core$Maybe$map,
+			_elm_lang$core$List$reverse,
+			_elm_lang$core$List$tail(
+				_elm_lang$core$List$reverse(chars))));
+	return {ctor: '_Tuple2', _0: value, _1: suit};
+};
+var _user$project$Main$Num = function (a) {
+	return {ctor: 'Num', _0: a};
+};
+var _user$project$Main$parseNumValue = function (v) {
+	var _p2 = _elm_lang$core$String$toInt(v);
+	if (_p2.ctor === 'Ok') {
+		var _p3 = _p2._0;
+		return ((_elm_lang$core$Native_Utils.cmp(_p3, 2) > -1) && (_elm_lang$core$Native_Utils.cmp(_p3, 10) < 1)) ? _elm_lang$core$Maybe$Just(
+			_user$project$Main$Num(_p3)) : _elm_lang$core$Maybe$Nothing;
+	} else {
+		return _elm_lang$core$Maybe$Nothing;
+	}
+};
+var _user$project$Main$Ace = {ctor: 'Ace'};
+var _user$project$Main$King = {ctor: 'King'};
+var _user$project$Main$Queen = {ctor: 'Queen'};
+var _user$project$Main$Jack = {ctor: 'Jack'};
+var _user$project$Main$parseValue = function (v) {
+	var _p4 = v;
+	switch (_p4) {
+		case 'J':
+			return _elm_lang$core$Maybe$Just(_user$project$Main$Jack);
+		case 'Q':
+			return _elm_lang$core$Maybe$Just(_user$project$Main$Queen);
+		case 'K':
+			return _elm_lang$core$Maybe$Just(_user$project$Main$King);
+		case 'A':
+			return _elm_lang$core$Maybe$Just(_user$project$Main$Ace);
+		default:
+			return _user$project$Main$parseNumValue(v);
+	}
+};
+var _user$project$Main$Heart = {ctor: 'Heart'};
+var _user$project$Main$Spade = {ctor: 'Spade'};
+var _user$project$Main$Diamond = {ctor: 'Diamond'};
+var _user$project$Main$Club = {ctor: 'Club'};
+var _user$project$Main$parseSuit = function (s) {
+	var _p5 = s;
+	switch (_p5.valueOf()) {
+		case 'C':
+			return _elm_lang$core$Maybe$Just(_user$project$Main$Club);
+		case 'D':
+			return _elm_lang$core$Maybe$Just(_user$project$Main$Diamond);
+		case 'S':
+			return _elm_lang$core$Maybe$Just(_user$project$Main$Spade);
+		case 'H':
+			return _elm_lang$core$Maybe$Just(_user$project$Main$Heart);
+		default:
+			return _elm_lang$core$Maybe$Nothing;
+	}
+};
+var _user$project$Main$Joker = {ctor: 'Joker'};
+var _user$project$Main$OrdinaryCard = F2(
+	function (a, b) {
+		return {ctor: 'OrdinaryCard', _0: a, _1: b};
+	});
+var _user$project$Main$parseCardTuple = function (_p6) {
+	var _p7 = _p6;
+	var _p8 = {
+		ctor: '_Tuple2',
+		_0: A2(_elm_lang$core$Maybe$andThen, _p7._0, _user$project$Main$parseValue),
+		_1: A2(_elm_lang$core$Maybe$andThen, _p7._1, _user$project$Main$parseSuit)
+	};
+	if (((_p8.ctor === '_Tuple2') && (_p8._0.ctor === 'Just')) && (_p8._1.ctor === 'Just')) {
+		return _elm_lang$core$Maybe$Just(
+			A2(_user$project$Main$OrdinaryCard, _p8._0._0, _p8._1._0));
+	} else {
+		return _elm_lang$core$Maybe$Nothing;
+	}
+};
+var _user$project$Main$parseCardString = function (str) {
+	var _p9 = str;
+	if (_p9 === 'J') {
+		return _elm_lang$core$Maybe$Just(_user$project$Main$Joker);
+	} else {
+		return _user$project$Main$parseCardTuple(
+			_user$project$Main$divideCardString(str));
+	}
+};
+var _user$project$Main$spellCard = function (str) {
+	return A2(
+		_elm_lang$core$Maybe$withDefault,
+		'-- unknown card --',
+		A2(
+			_elm_lang$core$Maybe$map,
+			_user$project$Main$printCard,
+			_user$project$Main$parseCardString(str)));
+};
+var _user$project$Main$main = {
+	main: _elm_lang$html$Html$text(
+		_user$project$Main$spellCard('JH'))
+};
