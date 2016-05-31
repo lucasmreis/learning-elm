@@ -83,6 +83,10 @@ update msg model =
 -- VIEW
 
 
+msgMap =
+    Html.App.map
+
+
 view : Model -> Html.Html Msg
 view model =
     case model of
@@ -91,27 +95,39 @@ view model =
 
         LoadingFilms ch ->
             div [ style [ ( "display", "flex" ) ] ]
-                [ (Character.view LoadFilms ch)
+                [ msgMap LoadFilms (Character.view ch)
                 , loadingView ("Loading " ++ ch.name ++ " films...")
                 ]
 
         FilmsFromCharacter ch fs ->
-            div [ style [ ( "display", "flex" ) ] ]
-                [ (Character.view LoadFilms ch)
-                , div [] (List.map (Film.view LoadCharacters) fs)
-                ]
+            let
+                filmsView =
+                    fs
+                        |> List.map Film.view
+                        |> List.map (msgMap LoadCharacters)
+            in
+                div [ style [ ( "display", "flex" ) ] ]
+                    [ msgMap LoadFilms (Character.view ch)
+                    , div [] filmsView
+                    ]
 
         LoadingCharacters f ->
             div [ style [ ( "display", "flex" ) ] ]
-                [ (Film.view LoadCharacters f)
+                [ msgMap LoadCharacters (Film.view f)
                 , loadingView ("Loading " ++ f.title ++ " characters...")
                 ]
 
         CharactersFromFilm f chs ->
-            div [ style [ ( "display", "flex" ) ] ]
-                [ (Film.view LoadCharacters f)
-                , div [] (List.map (Character.view LoadFilms) chs)
-                ]
+            let
+                charactersViews =
+                    chs
+                        |> List.map Character.view
+                        |> List.map (msgMap LoadFilms)
+            in
+                div [ style [ ( "display", "flex" ) ] ]
+                    [ msgMap LoadCharacters (Film.view f)
+                    , div [] charactersViews
+                    ]
 
 
 loadingView : String -> Html.Html a

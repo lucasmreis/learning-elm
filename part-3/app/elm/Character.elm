@@ -1,4 +1,4 @@
-module Character exposing (Model, sample, view, characterDecoder)
+module Character exposing (Model, view, characterDecoder)
 
 import Html exposing (div, text)
 import Html.Attributes exposing (style)
@@ -20,16 +20,10 @@ characterDecoder =
         |: ("films" := list string)
 
 
-sample : Model
-sample =
-    { name = "Luke Skywalker"
-    , films = [ "3", "4", "5" ]
-    }
-
-
-view msg model =
+view : Model -> Html.Html Model
+view model =
     div
-        [ onClick (msg model)
+        [ onClick model
         , mainStyle
         ]
         [ div [ nameStyle ] [ text model.name ] ]

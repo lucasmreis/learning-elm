@@ -1,4 +1,4 @@
-module Film exposing (Model, view, sample, filmDecoder)
+module Film exposing (Model, view, filmDecoder)
 
 import Html exposing (div, text)
 import Html.Attributes exposing (style)
@@ -22,17 +22,10 @@ filmDecoder =
         |: ("characters" := list string)
 
 
-sample : Model
-sample =
-    { title = "A New Hope"
-    , episode_id = 4
-    , characters = [ "1", "2" ]
-    }
-
-
-view msg model =
+view : Model -> Html.Html Model
+view model =
     div
-        [ onClick (msg model)
+        [ onClick model
         , mainStyle
         ]
         [ div [ numberStyle ] [ text (toString model.episode_id) ]
