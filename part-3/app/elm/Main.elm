@@ -1,182 +1,77 @@
 module Main exposing (..)
 
-import Html exposing (div, text, p)
+import Html exposing (div)
 import Html.Attributes exposing (style)
 import Html.App
-import Task
-import Http
-import Film
 import Character
+import Film
 
 
-main : Program Never
 main =
-    Html.App.program
-        { init = init
+    Html.App.beginnerProgram
+        { model = model
         , view = view
         , update = update
-        , subscriptions = subscriptions
         }
 
 
 
 -- MODEL
+-- Aliases added for reading simplicity
+
+
+type alias C =
+    Character.Model
+
+
+type alias F =
+    Film.Model
 
 
 type Model
-    = InitialScreen
-    | LoadingFilms Character.Model
-    | LoadingCharacters Film.Model
-    | FilmsFromCharacter Character.Model (List Film.Model)
-    | CharactersFromFilm Film.Model (List Character.Model)
-
-
-init : ( Model, Cmd Msg )
-init =
-    ( InitialScreen
-    , getCharacter "http://swapi.co/api/people/1/"
-    )
+    = FilmsFromCharacter C (List F)
+    | CharactersFromFilm F (List C)
 
 
 
--- UPDATE
+-- SAMPLE
 
 
-type Msg
-    = LoadCharacters Film.Model
-    | ToCharactersFromFilm Film.Model (List Character.Model)
-    | LoadFilms Character.Model
-    | ToFilmsFromCharacter Character.Model (List Film.Model)
-    | FetchFail Http.Error
+update model =
+    model
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
-    case msg of
-        LoadFilms ch ->
-            ( LoadingFilms ch
-            , getFilmsFromCharacter ch
-            )
-
-        ToFilmsFromCharacter c fs ->
-            ( FilmsFromCharacter c fs
-            , Cmd.none
-            )
-
-        LoadCharacters f ->
-            ( LoadingCharacters f
-            , getCharactersFromFilm f
-            )
-
-        ToCharactersFromFilm f chs ->
-            ( CharactersFromFilm f chs
-            , Cmd.none
-            )
-
-        _ ->
-            ( model
-            , Cmd.none
-            )
+sampleCh : Character.Model
+sampleCh =
+    { name = "Luke Skywalker"
+    }
 
 
-
--- VIEW
-
-
-msgMap =
-    Html.App.map
-
-
-view : Model -> Html.Html Msg
-view model =
-    case model of
-        InitialScreen ->
-            loadingView "Loading amazing characters and films..."
-
-        LoadingFilms ch ->
-            div [ style [ ( "display", "flex" ) ] ]
-                [ msgMap LoadFilms (Character.view ch)
-                , loadingView ("Loading " ++ ch.name ++ " films...")
-                ]
-
-        FilmsFromCharacter ch fs ->
-            let
-                filmsView =
-                    fs
-                        |> List.map Film.view
-                        |> List.map (msgMap LoadCharacters)
-            in
-                div [ style [ ( "display", "flex" ) ] ]
-                    [ msgMap LoadFilms (Character.view ch)
-                    , div [] filmsView
-                    ]
-
-        LoadingCharacters f ->
-            div [ style [ ( "display", "flex" ) ] ]
-                [ msgMap LoadCharacters (Film.view f)
-                , loadingView ("Loading " ++ f.title ++ " characters...")
-                ]
-
-        CharactersFromFilm f chs ->
-            let
-                charactersViews =
-                    chs
-                        |> List.map Character.view
-                        |> List.map (msgMap LoadFilms)
-            in
-                div [ style [ ( "display", "flex" ) ] ]
-                    [ msgMap LoadCharacters (Film.view f)
-                    , div [] charactersViews
-                    ]
+sampleFilm : Film.Model
+sampleFilm =
+    { title = "A New Hope"
+    , episode_id = 4
+    }
 
 
-loadingView : String -> Html.Html a
-loadingView t =
-    div [ loadingStyle ] [ text t ]
-
-
-loadingStyle =
-    style
-        [ ( "margin", "20px 0px 0px 20px" )
-        , ( "width", "200px" )
-        , ( "height", "200px" )
-        , ( "font-family", "-apple-system, system, sans-serif" )
-        , ( "color", "rgba(149, 165, 166,1.0)" )
-        , ( "font-size", "18px" )
+model =
+    FilmsFromCharacter sampleCh
+        [ sampleFilm
+        , sampleFilm
+        , sampleFilm
         ]
 
 
+view model =
+    case model of
+        FilmsFromCharacter c fs ->
+            div [ style [ ( "display", "flex" ) ] ]
+                [ Character.view c
+                , div [] (List.map Film.view fs)
+                ]
 
--- SUBSCRIPTIONS
-
-
-subscriptions : Model -> Sub Msg
-subscriptions model =
-    Sub.none
-
-
-
--- HTML
-
-
-getCharacter : String -> Cmd Msg
-getCharacter url =
-    url
-        |> (Http.get Character.characterDecoder)
-        |> Task.perform FetchFail LoadFilms
-
-
-getFilmsFromCharacter : Character.Model -> Cmd Msg
-getFilmsFromCharacter ch =
-    ch.films
-        |> List.map (Http.get Film.filmDecoder)
-        |> Task.sequence
-        |> Task.perform FetchFail (ToFilmsFromCharacter ch)
-
-
-getCharactersFromFilm : Film.Model -> Cmd Msg
-getCharactersFromFilm f =
-    f.characters
-        |> List.map (Http.get Character.characterDecoder)
-        |> Task.sequence
-        |> Task.perform FetchFail (ToCharactersFromFilm f)
+        CharactersFromFilm f cs ->
+            div [ style [ ( "display", "flex" ) ] ]
+                [ Film.view f
+                , div [] (List.map Character.view cs)
+                ]

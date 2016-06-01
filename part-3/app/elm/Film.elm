@@ -1,36 +1,26 @@
-module Film exposing (Model, view, filmDecoder)
+module Film exposing (..)
 
 import Html exposing (div, text)
 import Html.Attributes exposing (style)
-import Html.Events exposing (onClick)
-import Json.Decode.Extra exposing ((|:))
-import Json.Decode exposing (Decoder, decodeValue, succeed, string, list, int, (:=))
 
 
 type alias Model =
     { title : String
     , episode_id : Int
-    , characters : List String
     }
 
 
-filmDecoder : Decoder Model
-filmDecoder =
-    succeed Model
-        |: ("title" := string)
-        |: ("episode_id" := int)
-        |: ("characters" := list string)
-
-
-view : Model -> Html.Html Model
 view model =
-    div
-        [ onClick model
-        , mainStyle
-        ]
-        [ div [ numberStyle ] [ text (toString model.episode_id) ]
-        , div [ nameStyle ] [ text model.title ]
-        ]
+    let
+        chapter =
+            toString model.episode_id
+    in
+        div [ mainStyle ]
+            [ div [ numberStyle ]
+                [ text chapter ]
+            , div [ nameStyle ]
+                [ text model.title ]
+            ]
 
 
 mainStyle =

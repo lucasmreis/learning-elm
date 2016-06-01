@@ -1,31 +1,16 @@
-module Character exposing (Model, view, characterDecoder)
+module Character exposing (..)
 
 import Html exposing (div, text)
 import Html.Attributes exposing (style)
-import Html.Events exposing (onClick)
-import Json.Decode.Extra exposing ((|:))
-import Json.Decode exposing (Decoder, decodeValue, succeed, string, list, int, (:=))
 
 
 type alias Model =
     { name : String
-    , films : List String
     }
 
 
-characterDecoder : Decoder Model
-characterDecoder =
-    succeed Model
-        |: ("name" := string)
-        |: ("films" := list string)
-
-
-view : Model -> Html.Html Model
 view model =
-    div
-        [ onClick model
-        , mainStyle
-        ]
+    div [ mainStyle ]
         [ div [ nameStyle ] [ text model.name ] ]
 
 
