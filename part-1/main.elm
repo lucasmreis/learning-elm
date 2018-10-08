@@ -98,7 +98,8 @@ divideCardString str =
 
 parseCardTuple : ( Maybe String, Maybe Char ) -> Maybe Card
 parseCardTuple ( value, suit ) =
-    case ( value `Maybe.andThen` parseValue, suit `Maybe.andThen` parseSuit ) of
+    case ( Maybe.andThen parseValue value, Maybe.andThen parseSuit suit ) of
+{--    case ( value `Maybe.andThen` parseValue, suit `Maybe.andThen` parseSuit ) of --}
         ( Just v, Just s ) ->
             Just (OrdinaryCard v s)
 
